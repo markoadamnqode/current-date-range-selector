@@ -1,12 +1,16 @@
-import './App.css'
-import { DateRangeSelector } from './components/DateRangeSelector'
+import "./App.css";
+import { DateRangeSelector } from "./components/DateRangeSelector";
 
 function App() {
   return (
     <>
-      <DateRangeSelector />
+      <DateRangeSelector
+        onChange={(start, end) => {
+          console.log("Date selection changed", start, end);
+        }}
+      />
     </>
-  )
+  );
 }
 
-export default App
+export default App;

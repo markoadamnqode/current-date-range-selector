@@ -42,7 +42,7 @@ dayjs.extend(advancedFormat);
 dayjs.extend(localizedFormat);
 
 type Props = {
-  onChange?: (start: Date, end: Date) => void;
+  onChange: (start: Date, end: Date) => void;
   defaultMode?: Mode;
 };
 
@@ -54,63 +54,12 @@ const startEnd = (
   end: d.endOf(unit),
 });
 
-const rangeForModeFromAnchor = (mode: Mode, anchor: Dayjs): Range => {
-  switch (mode) {
-    case "day":
-      return startEnd(anchor, "day");
-    case "week":
-      return { start: anchor.startOf("week"), end: anchor.endOf("week") };
-    case "month":
-      return startEnd(anchor, "month");
-    case "year":
-      return startEnd(anchor, "year");
-    case "custom":
-    default:
-      return {
-        start: anchor.startOf("day"),
-        end: anchor.endOf("day"),
-      };
-  }
-};
-
-const shift = (r: Range, mode: Mode, dir: -1 | 1): Range => {
-  switch (mode) {
-    case "day":
-      return {
-        start: r.start.add(dir, "day").startOf("day"),
-        end: r.end.add(dir, "day").endOf("day"),
-      };
-    case "week":
-      return {
-        start: r.start.add(dir, "week").startOf("week"),
-        end: r.end.add(dir, "week").endOf("week"),
-      };
-    case "month":
-      return {
-        start: r.start.add(dir, "month").startOf("month"),
-        end: r.end.add(dir, "month").endOf("month"),
-      };
-    case "year":
-      return {
-        start: r.start.add(dir, "year").startOf("year"),
-        end: r.end.add(dir, "year").endOf("year"),
-      };
-    case "custom":
-    default:
-      return r;
-  }
-};
-
 export const DateRangeSelector = ({
   onChange,
   defaultMode = Mode.DAY,
 }: Props) => {
   const [mode, setMode] = useState<Mode>(defaultMode);
-
-  const size = CENTAR_BUTTON_SIZE_BY_MODE[mode];
-
-  const leftButtonSize = LEFT_BUTTON_SIZE_BY_MODE[mode];
-
+  const [opened, setOpened] = useState(false);
   const [anchor, setAnchor] = useState<Dayjs>(dayjs());
 
   const [customRange, setCustomRange] = useState<Range>({
@@ -123,26 +72,72 @@ export const DateRangeSelector = ({
     customRange.end.toDate(),
   ]);
 
+  const size = CENTAR_BUTTON_SIZE_BY_MODE[mode];
+  const leftButtonSize = LEFT_BUTTON_SIZE_BY_MODE[mode];
+
   const openPicker = () => {
     setRangeDraft([customRange.start.toDate(), customRange.end.toDate()]);
     setOpened(true);
   };
 
-  const [opened, setOpened] = useState(false);
+  const rangeForModeFromAnchor = (mode: Mode, anchor: Dayjs): Range => {
+    switch (mode) {
+      case Mode.DAY:
+        return startEnd(anchor, "day");
+      case Mode.WEEK:
+        return {
+          start: anchor.startOf("isoWeek"),
+          end: anchor.endOf("isoWeek"),
+        };
+      case Mode.MONTH:
+        return startEnd(anchor, "month");
+      case Mode.YEAR:
+        return startEnd(anchor, "year");
+      case Mode.CUSTOM:
+      default:
+        return {
+          start: anchor.startOf("day"),
+          end: anchor.endOf("day"),
+        };
+    }
+  };
+
+  const shift = (range: Range, mode: Mode, direction: -1 | 1): Range => {
+    switch (mode) {
+      case Mode.DAY:
+        return {
+          start: range.start.add(direction, "day").startOf("day"),
+          end: range.end.add(direction, "day").endOf("day"),
+        };
+      case Mode.WEEK:
+        return {
+          start: range.start.add(direction, "week").startOf("isoWeek"),
+          end: range.end.add(direction, "week").endOf("isoWeek"),
+        };
+      case Mode.MONTH:
+        return {
+          start: range.start.add(direction, "month").startOf("month"),
+          end: range.end.add(direction, "month").endOf("month"),
+        };
+      case Mode.YEAR:
+        return {
+          start: range.start.add(direction, "year").startOf("year"),
+          end: range.end.add(direction, "year").endOf("year"),
+        };
+      case Mode.CUSTOM:
+      default:
+        return range;
+    }
+  };
 
   const currentRange: Range = useMemo(() => {
     if (mode === Mode.CUSTOM) return customRange;
     return rangeForModeFromAnchor(mode, anchor);
   }, [mode, anchor, customRange]);
 
-  useEffect(() => {
-    if (!onChange) return;
-    onChange(currentRange.start.toDate(), currentRange.end.toDate());
-  }, [currentRange.start, currentRange.end, onChange]);
-
-  const setModeAndReset = (m: Mode) => {
-    setMode(m);
-    if (m === Mode.CUSTOM) {
+  const setModeAndReset = (mode: Mode) => {
+    setMode(mode);
+    if (mode === Mode.CUSTOM) {
       setOpened(true);
     } else {
       setAnchor(dayjs());
@@ -154,34 +149,48 @@ export const DateRangeSelector = ({
 
   const renderPicker = () => {
     switch (mode) {
-      case "day":
+      case Mode.DAY:
         return (
           <DatePicker
             value={currentRange.start.toDate()}
-            onChange={(d) => {
-              if (!d) return;
-              const dd = dayjs(d);
-              setAnchor(dd);
+            onChange={(date) => {
+              if (!date) return;
+              const formatedDate = dayjs(date);
+              setAnchor(formatedDate);
               setOpened(false);
+
+              onChange(currentRange.start.toDate(), currentRange.end.toDate());
             }}
           />
         );
-      case "week":
+      case Mode.WEEK:
         return (
           <Calendar
+            withCellSpacing={false}
             getDayProps={(date) => {
-              const d = dayjs(date);
+              const day = dayjs(date);
+              const selStart = currentRange.start.startOf("day");
+              const selEnd = currentRange.end.endOf("day");
+
+              const inRange =
+                day.isSame(selStart, "day") ||
+                day.isSame(selEnd, "day") ||
+                (day.isAfter(selStart, "day") && day.isBefore(selEnd, "day"));
+
               return {
-                selected: d.isSame(currentRange.start, "week"),
+                inRange,
+                firstInRange: day.isSame(selStart, "day"),
+                lastInRange: day.isSame(selEnd, "day"),
+                selected: inRange,
                 onClick: () => {
-                  setAnchor(d);
+                  setAnchor(day);
                   setOpened(false);
                 },
               };
             }}
           />
         );
-      case "month":
+      case Mode.MONTH:
         return (
           <MonthPicker
             value={currentRange.start.toDate()}
@@ -192,20 +201,20 @@ export const DateRangeSelector = ({
             }}
           />
         );
-      case "year":
+      case Mode.YEAR:
         const currentYear = dayjs().endOf("year").toDate();
         return (
           <YearPicker
             value={currentYear}
-            onChange={(d) => {
-              if (!d) return;
-              setAnchor(dayjs(d));
+            onChange={(date) => {
+              if (!date) return;
+              setAnchor(dayjs(date));
               setOpened(false);
             }}
             maxDate={currentYear}
           />
         );
-      case "custom":
+      case Mode.CUSTOM:
         return (
           <DatePicker
             type="range"
@@ -221,6 +230,8 @@ export const DateRangeSelector = ({
                 setCustomRange({ start, end });
                 setOpened(false);
               }
+
+              onChange(currentRange.start.toDate(), currentRange.end.toDate());
             }}
             allowSingleDateInRange
           />
@@ -240,10 +251,14 @@ export const DateRangeSelector = ({
               variant="transparent"
               h={54}
               px="sm"
-              leftSection={<FontAwesomeIcon icon={MODE_ICON[mode]} />}
+              leftSection={<FontAwesomeIcon icon={MODE_ICON[mode]} size="xl" />}
               bg={COLORS.lightGrey}
               rightSection={<FontAwesomeIcon icon={faAngleDown} />}
-              styles={noChromeButtonStyles}
+              styles={{
+                ...noChromeButtonStyles,
+                section: { marginRight: 4 },
+                label: { fontWeight: 600, fontSize: 18 },
+              }}
             >
               <Text fw={600} fz={18}>
                 {modeLabel(mode)}

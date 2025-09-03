@@ -7,6 +7,7 @@ import { faCalendarWeek } from "@fortawesome/free-solid-svg-icons/faCalendarWeek
 export const COLORS = {
   black: "#003243",
   lightGrey: "#EFF0F0",
+  yellow: "#FEFE2D",
 };
 
 export const CENTAR_BUTTON_SIZE_BY_MODE = {

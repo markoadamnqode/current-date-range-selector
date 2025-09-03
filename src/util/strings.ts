@@ -1,15 +1,16 @@
 import dayjs from "dayjs";
-import type { Mode, Range } from "../interfaces/general";
+import { Mode, type Range } from "../interfaces/general";
 import { isCurrent } from "./date";
 
-export const centerLabel = (mode: Mode, r: Range): string => {
+export const centerLabel = (mode: Mode, range: Range): string => {
   if (mode === "day") {
-    if (r.start.isSame(dayjs(), "day")) return "Today";
-    if (r.start.isSame(dayjs().subtract(1, "day"), "day")) return "Yesterday";
-    return r.start.format("DD MMM YYYY");
+    if (range.start.isSame(dayjs(), "day")) return "Today";
+    if (range.start.isSame(dayjs().subtract(1, "day"), "day"))
+      return "Yesterday";
+    return range.start.format("DD MMM YYYY");
   }
 
-  if (mode !== "custom" && isCurrent(mode, r)) {
+  if (mode !== "custom" && isCurrent(mode, range)) {
     return mode === "week"
       ? "This week"
       : mode === "month"
@@ -18,16 +19,16 @@ export const centerLabel = (mode: Mode, r: Range): string => {
   }
 
   switch (mode) {
-    case "week": {
-      const wk = r.start.week();
-      return `Week ${wk} ${r.start.format("YYYY")}`;
+    case Mode.WEEK: {
+      const week = range.start.week();
+      return `Week ${week} ${range.start.format("YYYY")}`;
     }
-    case "month":
-      return r.start.format("MMMM YYYY");
-    case "year":
-      return r.start.format("YYYY");
+    case Mode.MONTH:
+      return range.start.format("MMMM YYYY");
+    case Mode.YEAR:
+      return range.start.format("YYYY");
     case "custom":
-      return `${r.start.format("DD-MM-YYYY")} | ${r.end.format("DD-MM-YYYY")}`;
+      return `${range.start.format("DD-MM-YYYY")} | ${range.end.format("DD-MM-YYYY")}`;
 
     default:
       return "";
@@ -36,15 +37,15 @@ export const centerLabel = (mode: Mode, r: Range): string => {
 
 export const modeLabel = (mode: Mode) => {
   switch (mode) {
-    case "day":
+    case Mode.DAY:
       return "Day";
-    case "week":
+    case Mode.WEEK:
       return "Week";
-    case "month":
+    case Mode.MONTH:
       return "Month";
-    case "year":
+    case Mode.YEAR:
       return "Year";
-    case "custom":
+    case Mode.CUSTOM:
       return "Custom";
   }
 };
