@@ -23,7 +23,12 @@ import weekOfYear from "dayjs/plugin/weekOfYear";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import localizedFormat from "dayjs/plugin/localizedFormat";
 
-import { COLORS, MODE_ICON, SIZE_BY_MODE } from "../util/theme";
+import {
+  COLORS,
+  MODE_ICON,
+  LEFT_BUTTON_SIZE_BY_MODE,
+  CENTAR_BUTTON_SIZE_BY_MODE,
+} from "../util/theme";
 import { DATE_RANGE_OPTIONS } from "../util/options";
 import type { Range, RangeTuple } from "../interfaces/general";
 import { Mode } from "../interfaces/general";
@@ -102,7 +107,9 @@ export const DateRangeSelector = ({
 }: Props) => {
   const [mode, setMode] = useState<Mode>(defaultMode);
 
-  const size = SIZE_BY_MODE[mode];
+  const size = CENTAR_BUTTON_SIZE_BY_MODE[mode];
+
+  const leftButtonSize = LEFT_BUTTON_SIZE_BY_MODE[mode];
 
   const [anchor, setAnchor] = useState<Dayjs>(dayjs());
 
@@ -228,6 +235,7 @@ export const DateRangeSelector = ({
         <Menu shadow="md" width={220}>
           <Menu.Target>
             <Button
+              {...leftButtonSize}
               c={COLORS.black}
               variant="transparent"
               h={54}
