@@ -4,7 +4,7 @@ import { DateRangeSelector } from './components/DateRangeSelector'
 function App() {
   return (
     <>
-      <DateRangeSelector/>
+      <DateRangeSelector />
     </>
   )
 }
