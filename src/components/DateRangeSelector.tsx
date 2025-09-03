@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import {
   ActionIcon,
   Button,
@@ -10,7 +10,6 @@ import {
 } from "@mantine/core";
 import { DatePicker, MonthPicker, YearPicker, Calendar } from "@mantine/dates";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
 import {
   faAngleDown,
   faAngleLeft,
@@ -155,11 +154,12 @@ export const DateRangeSelector = ({
             value={currentRange.start.toDate()}
             onChange={(date) => {
               if (!date) return;
-              const formatedDate = dayjs(date);
-              setAnchor(formatedDate);
+              const nextAnchor = dayjs(date);
+              const nextRange = rangeForModeFromAnchor(Mode.DAY, nextAnchor);
+              setAnchor(nextAnchor);
               setOpened(false);
 
-              onChange(currentRange.start.toDate(), currentRange.end.toDate());
+              onChange(nextRange.start.toDate(), nextRange.end.toDate());
             }}
           />
         );
@@ -183,8 +183,11 @@ export const DateRangeSelector = ({
                 lastInRange: day.isSame(selEnd, "day"),
                 selected: inRange,
                 onClick: () => {
+                  const nextRange = rangeForModeFromAnchor(Mode.WEEK, day);
+
                   setAnchor(day);
                   setOpened(false);
+                  onChange(nextRange.start.toDate(), nextRange.end.toDate());
                 },
               };
             }}
@@ -196,8 +199,12 @@ export const DateRangeSelector = ({
             value={currentRange.start.toDate()}
             onChange={(date) => {
               if (!date) return;
-              setAnchor(dayjs(date));
+              const nextAnchor = dayjs(date);
+              const nextRange = rangeForModeFromAnchor(Mode.MONTH, nextAnchor);
+
+              setAnchor(nextAnchor);
               setOpened(false);
+              onChange(nextRange.start.toDate(), nextRange.end.toDate());
             }}
           />
         );
@@ -208,8 +215,12 @@ export const DateRangeSelector = ({
             value={currentYear}
             onChange={(date) => {
               if (!date) return;
-              setAnchor(dayjs(date));
+              const nextAnchor = dayjs(date);
+              const nextRange = rangeForModeFromAnchor(Mode.YEAR, nextAnchor);
+
+              setAnchor(nextAnchor);
               setOpened(false);
+              onChange(nextRange.start.toDate(), nextRange.end.toDate());
             }}
             maxDate={currentYear}
           />
@@ -229,9 +240,8 @@ export const DateRangeSelector = ({
                 const end = dayjs(endDate).endOf("day");
                 setCustomRange({ start, end });
                 setOpened(false);
+                onChange(start.toDate(), end.toDate());
               }
-
-              onChange(currentRange.start.toDate(), currentRange.end.toDate());
             }}
             allowSingleDateInRange
           />
@@ -240,25 +250,19 @@ export const DateRangeSelector = ({
   };
 
   return (
-    <Paper withBorder p="3px" radius="8px">
+    <Paper radius="8px">
       <Group gap={0} wrap="nowrap">
         {/* Period menu (Day / Week / Month / Year / Custom) */}
-        <Menu shadow="md" width={220}>
+        <Menu shadow="md" width={260} radius={8}>
           <Menu.Target>
             <Button
               {...leftButtonSize}
+              px="sm"
               c={COLORS.black}
               variant="transparent"
-              h={54}
-              px="sm"
               leftSection={<FontAwesomeIcon icon={MODE_ICON[mode]} size="xl" />}
               bg={COLORS.lightGrey}
               rightSection={<FontAwesomeIcon icon={faAngleDown} />}
-              styles={{
-                ...noChromeButtonStyles,
-                section: { marginRight: 4 },
-                label: { fontWeight: 600, fontSize: 18 },
-              }}
             >
               <Text fw={600} fz={18}>
                 {modeLabel(mode)}
