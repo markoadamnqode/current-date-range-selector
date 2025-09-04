@@ -10,7 +10,7 @@ export const COLORS = {
   yellow: "#FEFE2D",
 };
 
-export const CENTAR_BUTTON_SIZE_BY_MODE = {
+export const CENTRAL_BUTTON_SIZE_BY_MODE = {
   day: { w: 170, h: 48, radius: 6 },
   week: { w: 174, h: 48, radius: 6 },
   month: { w: 200, h: 48, radius: 6 },

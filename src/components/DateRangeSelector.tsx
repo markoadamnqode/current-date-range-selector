@@ -30,19 +30,19 @@ import {
   COLORS,
   MODE_ICON,
   LEFT_BUTTON_SIZE_BY_MODE,
-  CENTAR_BUTTON_SIZE_BY_MODE,
+  CENTRAL_BUTTON_SIZE_BY_MODE,
 } from "../util/theme";
 import { DATE_RANGE_OPTIONS } from "../util/options";
 import { Mode, type Range, type RangeTuple } from "../interfaces/general";
 import { isCurrent, rangeForModeFromAnchor } from "../util/date";
-import { centerLabel } from "../util/style";
-import { modeLabel } from "../util/strings";
+import { centerLabel, modeLabel } from "../util/strings";
 import {
   DATE_RANGE_PAPER_STYLES,
   ICON_STYLE_BY_MODE,
 } from "../util/componentStyles";
 import { shift } from "../util/direction";
 import { DateRangeSelectorOption } from "./DateRangeSelectorOption";
+import { useDisclosure } from "@mantine/hooks";
 
 dayjs.extend(isoWeek);
 dayjs.extend(weekOfYear);
@@ -55,7 +55,7 @@ type Props = {
 
 export const DateRangeSelector = ({ onChange }: Props) => {
   const [mode, setMode] = useState<Mode>(Mode.DAY);
-  const [opened, setOpened] = useState(false);
+  const [opened, { open, close }] = useDisclosure();
   const [anchor, setAnchor] = useState<Dayjs>(dayjs());
 
   const [customRange, setCustomRange] = useState<Range>({
@@ -68,7 +68,7 @@ export const DateRangeSelector = ({ onChange }: Props) => {
     customRange.end.toDate(),
   ]);
 
-  const size = CENTAR_BUTTON_SIZE_BY_MODE[mode];
+  const centralButtonSize = CENTRAL_BUTTON_SIZE_BY_MODE[mode];
   const leftButtonSize = LEFT_BUTTON_SIZE_BY_MODE[mode];
   const currentRange: Range = useMemo(() => {
     if (mode === Mode.CUSTOM) return customRange;
@@ -78,11 +78,11 @@ export const DateRangeSelector = ({ onChange }: Props) => {
   const canGoPrev = mode !== Mode.CUSTOM;
 
   const togglePicker = () => {
-    if (opened) {
-      setOpened(false);
-    } else {
+    if (!opened) {
       setRangeDraft([customRange.start.toDate(), customRange.end.toDate()]);
-      setOpened(true);
+      open();
+    } else {
+      close();
     }
   };
 
@@ -104,7 +104,7 @@ export const DateRangeSelector = ({ onChange }: Props) => {
     setMode(mode);
 
     if (mode === Mode.CUSTOM) {
-      setOpened(true);
+      open();
     } else {
       setAnchor(dayjs());
     }
@@ -112,24 +112,24 @@ export const DateRangeSelector = ({ onChange }: Props) => {
 
   const handleOnSelectWeek = (date: string) => {
     const day = dayjs(date);
-    const selStart = currentRange.start.startOf("day");
-    const selEnd = currentRange.end.endOf("day");
+    const startDate = currentRange.start.startOf("day");
+    const endDate = currentRange.end.endOf("day");
 
     const inRange =
-      day.isSame(selStart, "day") ||
-      day.isSame(selEnd, "day") ||
-      (day.isAfter(selStart, "day") && day.isBefore(selEnd, "day"));
+      day.isSame(startDate, "day") ||
+      day.isSame(endDate, "day") ||
+      (day.isAfter(startDate, "day") && day.isBefore(endDate, "day"));
 
     return {
       inRange,
-      firstInRange: day.isSame(selStart, "day"),
-      lastInRange: day.isSame(selEnd, "day"),
+      firstInRange: day.isSame(startDate, "day"),
+      lastInRange: day.isSame(endDate, "day"),
       selected: inRange,
       onClick: () => {
         const nextRange = rangeForModeFromAnchor(Mode.WEEK, day);
 
         setAnchor(day);
-        setOpened(false);
+        close();
         onChange(nextRange.start.toDate(), nextRange.end.toDate());
       },
     };
@@ -142,7 +142,7 @@ export const DateRangeSelector = ({ onChange }: Props) => {
     const nextRange = rangeForModeFromAnchor(mode, nextAnchor);
 
     setAnchor(nextAnchor);
-    setOpened(false);
+    close();
     onChange(nextRange.start.toDate(), nextRange.end.toDate());
   };
 
@@ -155,7 +155,7 @@ export const DateRangeSelector = ({ onChange }: Props) => {
       const start = dayjs(startDate).startOf("day");
       const end = dayjs(endDate).endOf("day");
       setCustomRange({ start, end });
-      setOpened(false);
+      open();
       onChange(start.toDate(), end.toDate());
     }
   };
@@ -227,16 +227,23 @@ export const DateRangeSelector = ({ onChange }: Props) => {
               bg={COLORS.lightGrey}
               rightSection={<FontAwesomeIcon icon={faAngleDown} />}
             >
-              <Text fw={600} fz={18}>
+              <Text fw={600} fz="lg">
                 {modeLabel(mode)}
               </Text>
             </Button>
           </Menu.Target>
-          <Menu.Dropdown w={260} h={232} bdrs={8} bd={1} p={8} bg="#FFFFFF">
-            {DATE_RANGE_OPTIONS.map((opt) => (
+          <Menu.Dropdown
+            w={260}
+            h={232}
+            bdrs={8}
+            bd={1}
+            p={8}
+            bg={COLORS.white}
+          >
+            {DATE_RANGE_OPTIONS.map((option) => (
               <DateRangeSelectorOption
-                key={opt.key}
-                opt={opt}
+                key={option.key}
+                option={option}
                 setModeAndReset={setModeAndReset}
               />
             ))}
@@ -259,19 +266,18 @@ export const DateRangeSelector = ({ onChange }: Props) => {
         {/* Center label + calendar */}
         <Popover
           opened={opened}
-          onChange={setOpened}
+          onChange={(next) => (next ? open() : close())}
           position="bottom-start"
           shadow="md"
           withinPortal
         >
           <Popover.Target>
             <Button
-              {...size}
+              {...centralButtonSize}
               c={COLORS.black}
               variant="transparent"
-              h={48}
-              px={16}
-              py={10}
+              px="md"
+              py="sm"
               onClick={togglePicker}
               rightSection={<FontAwesomeIcon icon={faAngleDown} />}
             >

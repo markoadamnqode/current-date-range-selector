@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import type { Mode } from "../interfaces/general";
 import type { FontAwesomeIconProps } from "@fortawesome/react-fontawesome";
+import { COLORS } from "./theme";
 
 type IconStyle = NonNullable<FontAwesomeIconProps["style"]>;
 
@@ -10,7 +11,7 @@ export const DATE_RANGE_PAPER_STYLES: CSSProperties = {
   alignItems: "center",
   padding: 3,
   gap: 2,
-  background: "#FFFFFF",
+  background: COLORS.white,
 };
 
 export const ICON_STYLE_BY_MODE: Record<Mode, IconStyle> = {

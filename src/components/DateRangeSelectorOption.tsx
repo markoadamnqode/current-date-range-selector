@@ -4,23 +4,23 @@ import { ICON_STYLE_BY_MODE } from "../util/componentStyles";
 import type { DateRangeOption, Mode } from "../interfaces/general";
 
 type Props = {
-  opt: DateRangeOption;
+  option: DateRangeOption;
   setModeAndReset: (mode: Mode) => void;
 };
 
-export const DateRangeSelectorOption = ({ opt, setModeAndReset }: Props) => {
+export const DateRangeSelectorOption = ({ option, setModeAndReset }: Props) => {
   const handleOnClick = () => {
-    setModeAndReset(opt.key);
+    setModeAndReset(option.key);
   };
 
   return (
     <>
-      {opt.isLast && <Menu.Divider h={1} m={8} w={244} />}
+      {option.isLast && <Menu.Divider h={1} m={8} w={244} />}
       <Menu.Item
         leftSection={
           <FontAwesomeIcon
-            icon={opt.icon}
-            style={ICON_STYLE_BY_MODE[opt.key]}
+            icon={option.icon}
+            style={ICON_STYLE_BY_MODE[option.key]}
           />
         }
         onClick={handleOnClick}
@@ -30,7 +30,7 @@ export const DateRangeSelectorOption = ({ opt, setModeAndReset }: Props) => {
         px={8}
       >
         <Text fw={600} fz={16} ml={8}>
-          {opt.label}
+          {option.label}
         </Text>
       </Menu.Item>
     </>
