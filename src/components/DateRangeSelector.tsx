@@ -16,11 +16,7 @@ import {
   type DatesRangeValue,
 } from "@mantine/dates";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faAngleDown,
-  faAngleLeft,
-  faAngleRight,
-} from "@fortawesome/free-solid-svg-icons";
+import { faChevronDown, faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import dayjs, { Dayjs } from "dayjs";
 import isoWeek from "dayjs/plugin/isoWeek";
 import weekOfYear from "dayjs/plugin/weekOfYear";
@@ -155,7 +151,7 @@ export const DateRangeSelector = ({ onChange }: Props) => {
       const start = dayjs(startDate).startOf("day");
       const end = dayjs(endDate).endOf("day");
       setCustomRange({ start, end });
-      open();
+      close();
       onChange(start.toDate(), end.toDate());
     }
   };
@@ -225,7 +221,7 @@ export const DateRangeSelector = ({ onChange }: Props) => {
                 />
               }
               bg={COLORS.lightGrey}
-              rightSection={<FontAwesomeIcon icon={faAngleDown} />}
+              rightSection={<FontAwesomeIcon icon={faChevronDown} />}
             >
               <Text fw={600} fz="lg">
                 {modeLabel(mode)}
@@ -238,7 +234,6 @@ export const DateRangeSelector = ({ onChange }: Props) => {
             bdrs={8}
             bd={1}
             p={8}
-            bg={COLORS.white}
           >
             {DATE_RANGE_OPTIONS.map((option) => (
               <DateRangeSelectorOption
@@ -261,7 +256,7 @@ export const DateRangeSelector = ({ onChange }: Props) => {
           onClick={handlePrev}
           disabled={!canGoPrev}
         >
-          <FontAwesomeIcon icon={faAngleLeft} />
+          <FontAwesomeIcon icon={faChevronLeft} />
         </ActionIcon>
         {/* Center label + calendar */}
         <Popover
@@ -279,7 +274,7 @@ export const DateRangeSelector = ({ onChange }: Props) => {
               px="md"
               py="sm"
               onClick={togglePicker}
-              rightSection={<FontAwesomeIcon icon={faAngleDown} />}
+              rightSection={<FontAwesomeIcon icon={faChevronDown} />}
             >
               <Text fw={600}>{centerLabel(mode, currentRange)}</Text>
             </Button>
@@ -298,7 +293,7 @@ export const DateRangeSelector = ({ onChange }: Props) => {
           onClick={handleNext}
           disabled={!canGoNext}
         >
-          <FontAwesomeIcon icon={faAngleRight} />
+          <FontAwesomeIcon icon={faChevronRight} />
         </ActionIcon>
       </Group>
     </Paper>

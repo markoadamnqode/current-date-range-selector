@@ -15,7 +15,7 @@ A reusable React component for selecting a **period** (Day / Week / Month / Year
 - FontAwesome
 - Vite dev server
 
-> Node **18+** recommended.
+> Node **22+** recommended.
 
 ---
 
