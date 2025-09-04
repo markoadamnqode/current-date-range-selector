@@ -110,17 +110,6 @@ export const DateRangeSelector = ({ onChange }: Props) => {
     }
   };
 
-  const handleOnChangeDay = (date: string | null) => {
-    if (!date) return;
-
-    const nextAnchor = dayjs(date);
-    const nextRange = rangeForModeFromAnchor(Mode.DAY, nextAnchor);
-    setAnchor(nextAnchor);
-    setOpened(false);
-
-    onChange(nextRange.start.toDate(), nextRange.end.toDate());
-  };
-
   const handleOnSelectWeek = (date: string) => {
     const day = dayjs(date);
     const selStart = currentRange.start.startOf("day");
@@ -146,22 +135,11 @@ export const DateRangeSelector = ({ onChange }: Props) => {
     };
   };
 
-  const handleOnSelectMonth = (date: string | null) => {
+  const handleOnSelectDate = (date: string | null) => {
     if (!date) return;
 
     const nextAnchor = dayjs(date);
-    const nextRange = rangeForModeFromAnchor(Mode.MONTH, nextAnchor);
-
-    setAnchor(nextAnchor);
-    setOpened(false);
-    onChange(nextRange.start.toDate(), nextRange.end.toDate());
-  };
-
-  const handleOnSelectYear = (date: string | null) => {
-    if (!date) return;
-
-    const nextAnchor = dayjs(date);
-    const nextRange = rangeForModeFromAnchor(Mode.YEAR, nextAnchor);
+    const nextRange = rangeForModeFromAnchor(mode, nextAnchor);
 
     setAnchor(nextAnchor);
     setOpened(false);
@@ -188,7 +166,7 @@ export const DateRangeSelector = ({ onChange }: Props) => {
         return (
           <DatePicker
             value={currentRange.start.toDate()}
-            onChange={handleOnChangeDay}
+            onChange={handleOnSelectDate}
           />
         );
       case Mode.WEEK:
@@ -199,7 +177,7 @@ export const DateRangeSelector = ({ onChange }: Props) => {
         return (
           <MonthPicker
             value={currentRange.start.toDate()}
-            onChange={handleOnSelectMonth}
+            onChange={handleOnSelectDate}
           />
         );
       case Mode.YEAR:
@@ -208,7 +186,7 @@ export const DateRangeSelector = ({ onChange }: Props) => {
         return (
           <YearPicker
             value={currentYear}
-            onChange={handleOnSelectYear}
+            onChange={handleOnSelectDate}
             maxDate={currentYear}
           />
         );
