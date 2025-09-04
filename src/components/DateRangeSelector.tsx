@@ -267,7 +267,7 @@ export const DateRangeSelector = ({ onChange }: Props) => {
         {/* Prev */}
         <ActionIcon
           c={COLORS.black}
-          variant="transparent"
+          bg="transparent"
           h={48}
           w={56}
           px={16}
@@ -305,7 +305,7 @@ export const DateRangeSelector = ({ onChange }: Props) => {
         {/* Next */}
         <ActionIcon
           c={COLORS.black}
-          variant="transparent"
+          bg="transparent"
           h={48}
           w={56}
           px={16}
