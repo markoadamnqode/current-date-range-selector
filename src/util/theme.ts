@@ -13,7 +13,7 @@ export const COLORS = {
 export const CENTAR_BUTTON_SIZE_BY_MODE = {
   day: { w: 170, h: 48, radius: 6 },
   week: { w: 174, h: 48, radius: 6 },
-  month: { w: 161, h: 48, radius: 6 },
+  month: { w: 200, h: 48, radius: 6 },
   year: { w: 140, h: 48, radius: 6 },
   custom: { w: 283, h: 48, radius: 6 },
 };

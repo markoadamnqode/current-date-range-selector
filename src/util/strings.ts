@@ -3,17 +3,17 @@ import { Mode, type Range } from "../interfaces/general";
 import { isCurrent } from "./date";
 
 export const centerLabel = (mode: Mode, range: Range): string => {
-  if (mode === "day") {
+  if (mode === Mode.DAY) {
     if (range.start.isSame(dayjs(), "day")) return "Today";
     if (range.start.isSame(dayjs().subtract(1, "day"), "day"))
       return "Yesterday";
     return range.start.format("DD MMM YYYY");
   }
 
-  if (mode !== "custom" && isCurrent(mode, range)) {
-    return mode === "week"
+  if (mode !== Mode.CUSTOM && isCurrent(mode, range)) {
+    return mode === Mode.WEEK
       ? "This week"
-      : mode === "month"
+      : mode === Mode.MONTH
         ? "This month"
         : "This year";
   }
@@ -27,7 +27,7 @@ export const centerLabel = (mode: Mode, range: Range): string => {
       return range.start.format("MMMM YYYY");
     case Mode.YEAR:
       return range.start.format("YYYY");
-    case "custom":
+    case Mode.CUSTOM:
       return `${range.start.format("DD-MM-YYYY")} | ${range.end.format("DD-MM-YYYY")}`;
 
     default:
